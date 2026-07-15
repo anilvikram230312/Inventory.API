@@ -1,17 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Inventory.API.Modals
+﻿namespace Inventory.API.DTOs
 {
-    public class Product
+    public class ProductResponseDto
     {
-        [Key]
         public int ProductId { get; set; }
         public string? ProductName { get; set; }
         public string? Description { get; set; }
         public decimal? Price { get; set; }
         public int? Quantity { get; set; }
-        public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedDate { get; set; }
         public int IsActive { get; set; }
     }
 }
