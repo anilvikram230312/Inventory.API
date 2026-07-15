@@ -44,10 +44,10 @@ namespace Inventory.API.Controllers
         }
 
         [HttpGet("GetProductById")]
-        public IActionResult GetProductById(int productId)
+        public async Task<IActionResult> GetProductById(int productId)
         {
-
-            return Ok();
+            var result = await productService.GetProductByIdAsync(productId);
+            return Ok(result);
         }
     }
 }

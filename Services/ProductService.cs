@@ -91,7 +91,7 @@ namespace Inventory.API.Services
                 {
                     apiResponse.IsError = true;
                     apiResponse.StatusCode = "404";
-                    apiResponse.StatusMessage= "No products found.";
+                    apiResponse.StatusMessage = "No products found.";
                     apiResponse.Result = new List<ProductResponseDto>();
 
                     return apiResponse;
@@ -109,7 +109,7 @@ namespace Inventory.API.Services
 
                 apiResponse.IsError = false;
                 apiResponse.StatusCode = "200";
-                apiResponse.StatusMessage= "Products fetched successfully.";
+                apiResponse.StatusMessage = "Products fetched successfully.";
                 apiResponse.Result = productDtoList;
 
                 return apiResponse;
@@ -125,11 +125,49 @@ namespace Inventory.API.Services
             }
         }
 
-        //public Task<ProductResponseDto> getProductById()
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public async Task<ApiResponse<ProductResponseDto>> GetProductByIdAsync(int productId)
+        {
+            var apiResponse = new ApiResponse<ProductResponseDto>();
+
+            try
+            {
+                var singleProduct = await _context.Products.Where(x=>x.ProductId == productId).FirstOrDefaultAsync();
+
+                if (singleProduct == null)
+                {
+                    apiResponse.IsError = true;
+                    apiResponse.StatusCode = "404";
+                    apiResponse.StatusMessage = "No products found.";
+                    apiResponse.Result = new ProductResponseDto();
+
+                    return apiResponse;
+                }
 
 
+                apiResponse.IsError = false;
+                apiResponse.StatusCode = "200";
+                apiResponse.StatusMessage = "Products fetched successfully.";
+                apiResponse.Result = new ProductResponseDto()
+                {
+                    ProductId = singleProduct.ProductId,
+                    ProductName = singleProduct.ProductName,
+                    Price = singleProduct.Price,
+                    Quantity = singleProduct.Quantity,
+                    Description = singleProduct.Description,
+                    IsActive = singleProduct.IsActive,
+                };
+
+                return apiResponse;
+            }
+            catch (Exception ex)
+            {
+                apiResponse.IsError = true;
+                apiResponse.StatusCode = "500";
+                apiResponse.StatusMessage = ex.Message;
+                apiResponse.Result = new ProductResponseDto();
+
+                return apiResponse;
+            }
+        }
     }
 }

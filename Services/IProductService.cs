@@ -7,7 +7,8 @@ namespace Inventory.API.Services
     {
         public Task<ApiResponse<ProductResponseDto>> AddProductAsync(ProductRequestDto product);
         public Task<ApiResponse<List<ProductResponseDto>>> GetProductsAsync();
-       // public Task<ProductResponseDto> getProductById();
-        
+        Task<ApiResponse<ProductResponseDto>> GetProductByIdAsync(int productId);
+
+
     }
 }
