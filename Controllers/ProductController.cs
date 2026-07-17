@@ -34,7 +34,6 @@ namespace Inventory.API.Controllers
             return StatusCode(StatusCodes.Status201Created, result);
         }
 
-
         [HttpGet("GetProducts")]
         public async Task<IActionResult> GetProducts()
         {
@@ -47,7 +46,35 @@ namespace Inventory.API.Controllers
         public async Task<IActionResult> GetProductById(int productId)
         {
             var result = await productService.GetProductByIdAsync(productId);
-            return Ok(result);
+            return StatusCode(StatusCodes.Status200OK,result);
+        }
+
+        [HttpPut("UpdateProduct")]
+        public async Task<IActionResult> UpdateProduct(int productId, ProductRequestDto product)
+        {
+            if (product == null && productId<=0)
+            {
+                return BadRequest();
+            }
+            var result =  await productService.UpdateProductAsync(productId, product);
+            if (result.IsError)
+                return BadRequest(result);
+
+            return StatusCode(StatusCodes.Status200OK, result);
+        }
+
+        [HttpDelete("DeleteProduct")]
+        public async Task<IActionResult> DeleteProduct(int productId)
+        {
+            if (productId <= 0)
+            {
+                return BadRequest();
+            }
+            var result = await productService.DeleteProductAsync(productId);
+            if (result.IsError)
+                return BadRequest(result);
+
+            return StatusCode(StatusCodes.Status200OK, result);
         }
     }
 }

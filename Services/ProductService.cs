@@ -131,7 +131,7 @@ namespace Inventory.API.Services
 
             try
             {
-                var singleProduct = await _context.Products.Where(x=>x.ProductId == productId).FirstOrDefaultAsync();
+                var singleProduct = await _context.Products.Where(x => x.ProductId == productId).FirstOrDefaultAsync();
 
                 if (singleProduct == null)
                 {
@@ -146,7 +146,7 @@ namespace Inventory.API.Services
 
                 apiResponse.IsError = false;
                 apiResponse.StatusCode = "200";
-                apiResponse.StatusMessage = "Products fetched successfully.";
+                apiResponse.StatusMessage = "Product fetched successfully.";
                 apiResponse.Result = new ProductResponseDto()
                 {
                     ProductId = singleProduct.ProductId,
@@ -157,6 +157,100 @@ namespace Inventory.API.Services
                     IsActive = singleProduct.IsActive,
                 };
 
+                return apiResponse;
+            }
+            catch (Exception ex)
+            {
+                apiResponse.IsError = true;
+                apiResponse.StatusCode = "500";
+                apiResponse.StatusMessage = ex.Message;
+                apiResponse.Result = new ProductResponseDto();
+
+                return apiResponse;
+            }
+        }
+
+        public async Task<ApiResponse<ProductResponseDto>> UpdateProductAsync(int productId, ProductRequestDto product)
+        {
+            var apiResponse = new ApiResponse<ProductResponseDto>();
+            try
+            {
+                var singleProduct = await _context.Products.Where(x => x.ProductId == productId).FirstOrDefaultAsync();
+                if (singleProduct != null)
+                {
+                    singleProduct.ProductName = product.ProductName;
+                    singleProduct.Description = product.Description;
+                    singleProduct.Price = product.Price;
+                    singleProduct.Quantity = product.Quantity;
+                    singleProduct.IsActive = product.IsActive;
+                    singleProduct.UpdatedDate = DateTime.UtcNow;
+                }
+
+                apiResponse.Result = new ProductResponseDto()
+                {
+                    ProductId = productId,
+                    ProductName = product.ProductName,
+                    Price = product.Price,
+                    Quantity = product.Quantity,
+                    Description = product.Description,
+                    IsActive = product.IsActive,
+
+                };
+                apiResponse.IsError = false;
+                apiResponse.StatusCode = "200";
+                apiResponse.StatusMessage = "Product Updated successfully.";
+
+                _context.Products.Update(singleProduct);
+                await _context.SaveChangesAsync();
+
+                return apiResponse;
+            }
+            catch (Exception ex)
+            {
+                apiResponse.IsError = true;
+                apiResponse.StatusCode = "500";
+                apiResponse.StatusMessage = ex.Message;
+                apiResponse.Result = new ProductResponseDto();
+
+                return apiResponse;
+            }
+        }
+
+        public async Task<ApiResponse<ProductResponseDto>> DeleteProductAsync(int productId)
+        {
+            var apiResponse = new ApiResponse<ProductResponseDto>();
+
+            try
+            {
+                var existingProduct = await _context.Products.Where(x=>x.ProductId== productId).FirstOrDefaultAsync();
+
+                if (existingProduct == null)
+                {
+                    apiResponse.IsError = true;
+                    apiResponse.StatusCode = "404";
+                    apiResponse.StatusMessage = "No products found.";
+                    apiResponse.Result = new ProductResponseDto();
+
+                    return apiResponse;
+                }
+                else
+                {
+                    apiResponse.Result = new ProductResponseDto()
+                    {
+                        ProductId = productId,
+                        ProductName = existingProduct.ProductName,
+                        Price = existingProduct.Price,
+                        Quantity = existingProduct.Quantity,
+                        Description = existingProduct.Description,
+                        IsActive = existingProduct.IsActive,
+                    };
+                    _context.Products.Remove(existingProduct);
+                    await _context.SaveChangesAsync();
+
+                    apiResponse.IsError = false;
+                    apiResponse.StatusCode = "200";
+                    apiResponse.StatusMessage = "Product Deleted successfully.";
+                }
                 return apiResponse;
             }
             catch (Exception ex)

@@ -21,7 +21,14 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultProductCo
 
 //Add All Services here
 builder.Services.AddScoped<IProductService, ProductService>();
-
+var productsCorsPolicy = "productsCorsPolicy";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(productsCorsPolicy, builder =>
+    {
+        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
@@ -33,7 +40,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors(productsCorsPolicy);
 app.UseAuthorization();
 
 app.MapControllers();
